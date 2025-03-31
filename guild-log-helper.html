@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Guild Log Helper</title>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+  textarea {
+    width: 300px;
+    height: 150px;
+    margin-bottom: 10px;
+  }
+  #results {
+    margin-top: 20px;
+  }
+  .result-list {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+  <h2>Compare Guild Lists (Column A)</h2>
+
+  <label for="listA">Guild List A (Column A):</label><br>
+  <textarea id="listA"></textarea><br>
+
+  <label for="listB">Guild List B (Column A):</label><br>
+  <textarea id="listB"></textarea><br>
+
+  <button onclick="compareLists()">Compare</button>
+
+  <div id="results"></div>
+
+  <script>
+    function compareLists() {
+      function extractName(line) {
+        let name = '';
+        const parts = line.split(' ');
+        for (const part of parts) {
+          if (isNaN(part) && !part.includes('-')) { // Check if it's not a number or date
+            name += (name ? ' ' : '') + part.trim();
+          } else {
+            break; // Stop when a number or date is encountered
+          }
+        }
+        return name;
+      }
+
+      const listA = document.getElementById('listA').value.split('\n').map(extractName).filter(name => name !== '');
+      const listB = document.getElementById('listB').value.split('\n').map(extractName).filter(name => name !== '');
+
+      const uniqueA = listA.filter(name => !listB.includes(name));
+      const uniqueB = listB.filter(name => !listA.includes(name));
+      const common = listA.filter(name => listB.includes(name));
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      const uniqueAList = document.createElement('div');
+      uniqueAList.classList.add('result-list');
+      uniqueAList.innerHTML = '<h3>Unique to Guild List A:</h3>' + (uniqueA.length > 0 ? uniqueA.join('<br>') : 'None');
+      resultsDiv.appendChild(uniqueAList);
+
+      const uniqueBList = document.createElement('div');
+      uniqueBList.classList.add('result-list');
+      uniqueBList.innerHTML = '<h3>Unique to Guild List B:</h3>' + (uniqueB.length > 0 ? uniqueB.join('<br>') : 'None');
+      resultsDiv.appendChild(uniqueBList);
+
+      const commonList = document.createElement('div');
+      commonList.classList.add('result-list');
+      commonList.innerHTML = '<h3>Common Guild Names:</h3>' + (common.length > 0 ? common.join('<br>') : 'None');
+      resultsDiv.appendChild(commonList);
+    }
+  </script>
+
+</body>
+</html>
